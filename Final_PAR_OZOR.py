@@ -65,10 +65,32 @@ def find_client(listado, palabra, campos):
 	
 	
 
-#Total de usuarios por empresa
-def total_users():
-	pass
-
+#Busqueda por empresa. Total de usuarios por empresa
+def find_company(listado, palabra, campos):
+	localizado = 0                             
+	company = ""
+	clientes = []
+	os.system('cls')
+        
+	for empresa in listado:                        
+		if palabra in empresa[5]:
+			
+			#print(f"{cliente[0]}, {cliente[1]}, {cliente[2]}, {cliente[3]}, {cliente[4]}, {cliente[5]}\n")
+			company = empresa[5]
+			clientes.append([empresa[0], empresa[1], empresa[2], empresa[3], empresa[4], empresa[5]])
+			localizado += 1       
+			
+			
+	if localizado == 0:                               
+		print("La busqueda no arrojó ningún resultado\n\n")
+		
+	print("---------------------------------------------------------------------------------------------------------------------------------------------------")
+	print(f"Empresa: {company}\nTotal de usuarios: {localizado}")
+	print("---------------------------------------------------------------------------------------------------------------------------------------------------")
+	print(campos)
+	for item in clientes:
+		print(f"{item}\n")
+	
 #Consultar montos por empresa
 def company_amounts():
 	pass
@@ -99,10 +121,12 @@ def menu():
 			exit()
 		if opcion == "1":
 			os.system('cls')
-			palabra_recibida = input("Por favor. A continuación, ingrese el nombre completo o parcial de la persona a buscar: ")
+			palabra_recibida = input("Ingrese el nombre completo o parcial de la persona a buscar: ")
 			find_client(_read_(), palabra_recibida, CAMPOS)
 		if opcion == "2":
-			total_users()
+			os.system('cls')
+			palabra_recibida = input("Ingrese el nombre completo o parcial de la empresa a consultar: ")
+			find_company(_read_(), palabra_recibida, CAMPOS)
 		if opcion == "3":
 			company_amounts()
 		if opcion == "4":
