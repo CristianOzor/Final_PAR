@@ -1,9 +1,69 @@
 import csv
 import os.path
+import datetime
 
-#buscar clientes
-def find_client():
-	pass
+
+
+#Voy a leer el archivo para alojar todos los datos en una lista
+def _read_():
+	os.system('cls')
+	
+	user_input = input("Ingrese el nombre del archivo para consultar: ")
+	choise_file = (f"{user_input}.csv")
+	
+	listado_clientes = []
+	
+	try:
+		with open (choise_file, "r", newline = '') as file:
+			
+			#Cargo el archivo en una variable
+			clientes_csv = csv.reader(file)
+				
+			#salteo el encabezado
+			next(clientes_csv)
+			
+			#empiezo a leer el archivo
+			clientes = next(clientes_csv, None)
+		
+			while clientes:
+				if (not clientes or clientes[0] != clientes[0]):
+					print("\tNo hay un cliente registrado")
+				else:
+					listado_clientes.append([clientes[0], clientes[1], clientes[2], clientes[3], clientes[4], clientes[5]])
+					
+										
+					
+				clientes = next(clientes_csv, None)
+				
+	
+	except IOError:
+		print("hubo un error en la lectura")
+	
+	return listado_clientes
+		
+	
+
+
+def find_client(listado, palabra, campos):
+	localizado = 0                             
+	
+	os.system('cls')
+	
+	print(campos)
+	print("-------------------------------------------------------------------------------------------------------------------------------------------")
+	                        
+	for cliente in listado:                        
+		if palabra in cliente[0]:
+			
+			print(f"{cliente[0]}, {cliente[1]}, {cliente[2]}, {cliente[3]}, {cliente[4]}, {cliente[5]}\n")
+			localizado += 1       
+	
+	print("-------------------------------------------------------------------------------------------------------------------------------------------\n\n")		
+	if localizado == 0:                               
+		print("La busqueda no arrojó ningún resultado\n\n")
+	   
+	
+	
 
 #Total de usuarios por empresa
 def total_users():
@@ -28,7 +88,7 @@ def inquiries():
 
 def menu():
 	
-	CAMPOS = ['Nombre', 'Direccion', 'Documento', 'Fecha Alta', 'Correo Electronico', 'Empresa']
+	CAMPOS = ['Nombre', 'Dirección', 'Documento', 'Fecha Alta', 'Correo Electrónico', 'Empresa']
 
 	while True:
 		print("Elija una opcion: \n 1.Buscar cliente \n 2.Total de usuarios por empresa \n 3.Consultar montos por empresa")
@@ -38,7 +98,9 @@ def menu():
 		if opcion == "5":
 			exit()
 		if opcion == "1":
-			find_client()
+			os.system('cls')
+			palabra_recibida = input("Por favor. A continuación, ingrese el nombre completo o parcial de la persona a buscar: ")
+			find_client(_read_(), palabra_recibida, CAMPOS)
 		if opcion == "2":
 			total_users()
 		if opcion == "3":
@@ -49,3 +111,7 @@ def menu():
 			print("Por favor elija una opcion valida")
 	
 menu()
+
+
+
+
