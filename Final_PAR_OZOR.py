@@ -2,19 +2,23 @@ import csv
 import os.path
 import datetime
 
+user_input = input("Ingrese el nombre del archivo con los datos de los clientes de la empresa: ")
+choise_file = (f"{user_input}.csv")
 
+os.system('cls')
+
+user_input2 = input("Ingrese el nombre del archivo que contienen los datos de los viajes por cliente: ")
+choise_file2 = (f"{user_input2}.csv")
 
 #Voy a leer el archivo para alojar todos los datos en una lista
-def _read_():
+def _read_(archivo_clientes):
 	os.system('cls')
 	
-	user_input = input("Ingrese el nombre del archivo para consultar: ")
-	choise_file = (f"{user_input}.csv")
 	
 	listado_clientes = []
 	
 	try:
-		with open (choise_file, "r", newline = '') as file:
+		with open (archivo_clientes, "r", newline = '') as file:
 			
 			#Cargo el archivo en una variable
 			clientes_csv = csv.reader(file)
@@ -87,13 +91,59 @@ def find_company(listado, palabra, campos):
 	print("---------------------------------------------------------------------------------------------------------------------------------------------------")
 	print(f"Empresa: {company}\nTotal de usuarios: {localizado}")
 	print("---------------------------------------------------------------------------------------------------------------------------------------------------")
-	print(campos)
+	print(f"{campos}\n")
 	for item in clientes:
 		print(f"{item}\n")
 	
 #Consultar montos por empresa
-def company_amounts():
-	pass
+def company_amounts(archivo_clientes, archivo_viajes):
+	os.system('cls')
+	
+	try:
+		with open (archivo_clientes, "r", newline = '') as file1, open (archivo_viajes, "r", newline = '') as file2:
+		
+			clientes_csv = csv.reader(file1)
+			viajes_csv = csv.reader(file2)
+		
+			#salteo los encabezados
+			next(clientes_csv)
+			next(viajes_csv)
+		
+			#empiezo a leer
+			clientes = next(clientes_csv, None)
+			viajes = next(viajes_csv, None)
+		
+
+		
+			empresa_buscada = input("Ingrese el nombre de la empresa a consultar: ")	
+		
+			company_name = ""
+			total_empresa = 0
+			while clientes:
+				if (not viajes or viajes[0] != clientes[2]):
+					print("\tEl documento no existe")
+			
+				#Creo q tome los archivos al reves para emparejar porque el ordenado es el de viajes
+				while (viajes and viajes[0] == clientes[2]):
+					company_name = clientes[5]
+					total_empresa = viajes[2]
+				
+					viajes = next(viajes_csv, None)
+			
+				empresa = clientes[5]
+				if (empresa == empresa_buscada):
+					print("---------------------------------------------------------------------------------------------------------------------------------------------------")
+					print(f"{company_name} {total_empresa}")
+					print("---------------------------------------------------------------------------------------------------------------------------------------------------")
+			
+				#if (empresa != empresa_buscada):
+					#print("La empresa buscada no existe")
+							
+			
+		
+	except IOError:
+		print("hubo un error en la lectura del alguno de los archivos")
+	
 
 #Consultar total de viajes y monto por DNI
 def amounts_travels_dni():
@@ -107,7 +157,7 @@ def save_query():
 def inquiries():
 	pass
 
-
+os.system('cls')
 def menu():
 	
 	CAMPOS = ['Nombre', 'Dirección', 'Documento', 'Fecha Alta', 'Correo Electrónico', 'Empresa']
@@ -122,13 +172,13 @@ def menu():
 		if opcion == "1":
 			os.system('cls')
 			palabra_recibida = input("Ingrese el nombre completo o parcial de la persona a buscar: ")
-			find_client(_read_(), palabra_recibida, CAMPOS)
+			find_client(_read_(choise_file), palabra_recibida, CAMPOS)
 		if opcion == "2":
 			os.system('cls')
 			palabra_recibida = input("Ingrese el nombre completo o parcial de la empresa a consultar: ")
-			find_company(_read_(), palabra_recibida, CAMPOS)
+			find_company(_read_(choise_file), palabra_recibida, CAMPOS)
 		if opcion == "3":
-			company_amounts()
+			company_amounts(choise_file, choise_file2)
 		if opcion == "4":
 			amounts_travels_dni()
 		else:
