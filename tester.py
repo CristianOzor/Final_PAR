@@ -3,18 +3,23 @@ import os.path
 import datetime
 
 
+user_input = input("Ingrese el nombre del archivo con los datos de los clientes de la empresa: ")
+choise_file = (f"{user_input}.csv")
+
+os.system('cls')
+
+user_input2 = input("Ingrese el nombre del archivo que contienen los datos de los viajes por cliente: ")
+choise_file2 = (f"{user_input2}.csv")
 
 #Voy a leer el archivo para alojar todos los datos en una lista
-def _read_():
+def _read_(archivo_clientes):
 	os.system('cls')
 	
-	user_input = input("Ingrese el nombre del archivo para consultar: ")
-	choise_file = (f"{user_input}.csv")
 	
 	listado_clientes = []
 	
 	try:
-		with open (choise_file, "r", newline = '') as file:
+		with open (archivo_clientes, "r", newline = '') as file:
 			
 			#Cargo el archivo en una variable
 			clientes_csv = csv.reader(file)
@@ -87,14 +92,65 @@ def find_company(listado, palabra, campos):
 	print("---------------------------------------------------------------------------------------------------------------------------------------------------")
 	print(f"Empresa: {company}\nTotal de usuarios: {localizado}")
 	print("---------------------------------------------------------------------------------------------------------------------------------------------------")
-	print(campos)
+	print(f"{campos}\n")
 	for item in clientes:
 		print(f"{item}\n")
 	
 #Consultar montos por empresa
-def company_amounts():
-	pass
-
+def company_amounts(archivo_clientes, archivo_viajes):
+	os.system('cls')
+	
+	listado_viajes = []
+	total_empresa = 0
+	
+	empresa_buscada = input("Ingrese el nombre de la empresa a consultar: ")	
+	
+	
+	try:
+		#Hay q abrir el archivo en utf para que corra bien el archivo viajes por la codificación que tiene
+		with open (archivo_viajes, "r" , newline = '', encoding = 'utf-8') as file1, open (archivo_clientes, "r" , newline = '') as file2:
+		
+			viajes_csv = csv.reader(file1)
+			clientes_csv = csv.reader(file2)
+		
+			#salteo el encabezado
+			next(viajes_csv)
+			next(clientes_csv)
+		
+			#empiezo a leer
+			viajes = next(viajes_csv, None)
+			clientes = next(clientes_csv, None)
+			
+			while viajes:
+				
+				if ((len(viajes[0]) >6) and (len(viajes[0]) < 9)):
+					try:
+						dni = int(viajes[0])
+						listado_viajes.append(dni)
+							
+					except ValueError:
+						print("Hay un caracter no numérico")
+				
+				#Tuve que configurar windows para que me tome el . como separador de decimales y la , como separador de miles
+				monto = viajes[2].replace(',', '.')
+				monto = float(monto)
+				
+				dict_Viajes = {"Documento": dni, "Monto": monto}
+				listado_viajes.append(dict_Viajes)
+				viajes = next(viajes_csv, None)
+				
+				
+					
+										
+		
+	except IOError:
+		print("hubo un error de lectura en alguno de los archivos. Por favor, asegurese de ingresarlos de forma correcta")
+	
+	#formato de solo 2 decimales al float
+	#print(f"{empresa_buscada} ${total_empresa:10.2f}")
+	
+	print(listado_viajes)
+	
 #Consultar total de viajes y monto por DNI
 def amounts_travels_dni():
 	pass
@@ -107,8 +163,7 @@ def save_query():
 def inquiries():
 	pass
 
-
-
+os.system('cls')
 def menu():
 	
 	CAMPOS = ['Nombre', 'Dirección', 'Documento', 'Fecha Alta', 'Correo Electrónico', 'Empresa']
@@ -123,13 +178,13 @@ def menu():
 		if opcion == "1":
 			os.system('cls')
 			palabra_recibida = input("Ingrese el nombre completo o parcial de la persona a buscar: ")
-			find_client(_read_(), palabra_recibida, CAMPOS)
+			find_client(_read_(choise_file), palabra_recibida, CAMPOS)
 		if opcion == "2":
 			os.system('cls')
 			palabra_recibida = input("Ingrese el nombre completo o parcial de la empresa a consultar: ")
-			find_company(_read_(), palabra_recibida, CAMPOS)
+			find_company(_read_(choise_file), palabra_recibida, CAMPOS)
 		if opcion == "3":
-			company_amounts()
+			company_amounts(choise_file, choise_file2)
 		if opcion == "4":
 			amounts_travels_dni()
 		else:

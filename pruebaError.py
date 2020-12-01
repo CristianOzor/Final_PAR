@@ -43,12 +43,6 @@ def _read_(archivo_clientes):
 	
 	except IOError:
 		print("hubo un error en la lectura")
-		
-	#Para q el código no se rompa al ingresar un archivo por falta de alguna columna y ayuda en la opcion de busqueda 
-	except IndexError:
-		print("ERROR! Se borró alguna columna en el archivo")
-		
-		
 	
 	return listado_clientes
 		
@@ -70,11 +64,8 @@ def find_client(listado, palabra, campos):
 			localizado += 1       
 	
 	print("---------------------------------------------------------------------------------------------------------------------------------------------------\n\n")		
-	
-	
-	if localizado == 0:
-		os.system('cls')                            
-		print("La busqueda no arrojó ningún resultado \nSugerencia: Intente volver a poner los nombres de los archivos nuevamente.\n\n")
+	if localizado == 0:                               
+		print("La busqueda no arrojó ningún resultado\n\n")
 	   
 	
 	
@@ -95,102 +86,22 @@ def find_company(listado, palabra, campos):
 			localizado += 1       
 			
 			
-	
-	if (localizado > 0):	
-		print("---------------------------------------------------------------------------------------------------------------------------------------------------")
-		print(f"Empresa: {company}\nTotal de usuarios: {localizado}")
-		print("---------------------------------------------------------------------------------------------------------------------------------------------------")
-		print(f"{campos}\n")
-	
-		for item in clientes:
-			print(f"{item}\n")
-		
-	else:
-		os.system('cls')                           
+	if localizado == 0:                               
 		print("La busqueda no arrojó ningún resultado\n\n")
+		
+	print("---------------------------------------------------------------------------------------------------------------------------------------------------")
+	print(f"Empresa: {company}\nTotal de usuarios: {localizado}")
+	print("---------------------------------------------------------------------------------------------------------------------------------------------------")
+	print(f"{campos}\n")
+	for item in clientes:
+		print(f"{item}\n")
 	
 #Consultar montos por empresa
 def company_amounts(archivo_clientes, archivo_viajes):
 	os.system('cls')
 	
-	listado_viajes = []
+	emp_buscada = input("Ingrese el nombre de la empresa a consultar")
 	
-	total_empresa = 0
-	empresa_localizada = ""
-	flag_localizado = 0
-	
-	empresa_buscada = input("Ingrese el nombre de la empresa a consultar: ")	
-	
-	
-	try:
-		#Hay q abrir el archivo en utf para que corra bien el archivo viajes por la codificación que tiene el otro lo abro en modo sistema
-		with open (archivo_viajes, "r" , newline = '', encoding = 'utf-8') as file1, open (archivo_clientes, "r" , newline = '') as file2:
-		
-			viajes_csv = csv.reader(file1)
-			clientes_csv = csv.reader(file2)
-		
-			#salteo el encabezado
-			next(viajes_csv)
-			next(clientes_csv)
-		
-			#empiezo a leer
-			viajes = next(viajes_csv, None)
-			clientes = next(clientes_csv, None)
-				
-			while viajes:
-				
-				if ((len(viajes[0]) >6) and (len(viajes[0]) < 9)):
-					try:
-						dni = int(viajes[0])
-						
-							
-					except ValueError:
-						print("Hay un caracter no numérico")
-				
-				#Tuve que configurar windows para que me tome el . como separador de decimales y la , como separador de miles
-				monto = viajes[2].replace(',', '.')
-				monto = float(monto)
-				
-				dict_Viajes = {"Documento": dni, "Monto": monto}
-				listado_viajes.append(dict_Viajes)
-				
-				viajes = next(viajes_csv, None)
-			
-			while clientes:
-				
-				if (empresa_buscada in clientes[5]):
-					empresa_localizada = clientes[5]
-					
-					flag_localizado += 1
-					
-					for dni in listado_viajes:
-						if dni["Documento"] == int(clientes[2]) :
-							total_empresa += dni["Monto"]
-				
-				
-				clientes = next(clientes_csv, None)	
-					
-	except IOError:
-		print("hubo un error de lectura en alguno de los archivos. Por favor, asegurese de ingresarlos de forma correcta")
-	
-	except IndexError:
-		print("ERROR! Se modificaron columnas en el archivo")
-	except Exception as errorCode:
-		print("Posiblemente ingreso los archivos al revés")
-		print(errorCode)
-	
-	os.system('cls')
-	
-	if (flag_localizado > 0):		
-		print("-------------------------------------------------------------------------------------------------------------")
-		#formato de solo 2 decimales al float
-		print(f"{empresa_localizada} ${total_empresa:10.2f}")
-		print("-------------------------------------------------------------------------------------------------------------\n\n")
-	
-	else: 
-		print("No existen registros de la empresa solicitada\n\n")
-	
-	#print(listado_viajes)
 	
 #Consultar total de viajes y monto por DNI
 def amounts_travels_dni():
@@ -232,7 +143,3 @@ def menu():
 			print("Por favor elija una opcion valida")
 	
 menu()
-
-
-
-
