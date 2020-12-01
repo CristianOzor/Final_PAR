@@ -43,6 +43,12 @@ def _read_(archivo_clientes):
 	
 	except IOError:
 		print("hubo un error en la lectura")
+		
+	#Para q el código no se rompa al ingresar un archivo por falta de alguna columna y ayuda en la opcion de busqueda 
+	except IndexError:
+		print("ERROR! Se borró alguna columna en el archivo")
+		
+		
 	
 	return listado_clientes
 		
@@ -64,8 +70,11 @@ def find_client(listado, palabra, campos):
 			localizado += 1       
 	
 	print("---------------------------------------------------------------------------------------------------------------------------------------------------\n\n")		
-	if localizado == 0:                               
-		print("La busqueda no arrojó ningún resultado\n\n")
+	
+	
+	if localizado == 0:
+		os.system('cls')                            
+		print("La busqueda no arrojó ningún resultado \nSugerencia: Intente volver a poner los nombres de los archivos nuevamente.\n\n")
 	   
 	
 	
@@ -86,28 +95,35 @@ def find_company(listado, palabra, campos):
 			localizado += 1       
 			
 			
-	if localizado == 0:                               
-		print("La busqueda no arrojó ningún resultado\n\n")
+	
+	if (localizado > 0):	
+		print("---------------------------------------------------------------------------------------------------------------------------------------------------")
+		print(f"Empresa: {company}\nTotal de usuarios: {localizado}")
+		print("---------------------------------------------------------------------------------------------------------------------------------------------------")
+		print(f"{campos}\n")
+	
+		for item in clientes:
+			print(f"{item}\n")
 		
-	print("---------------------------------------------------------------------------------------------------------------------------------------------------")
-	print(f"Empresa: {company}\nTotal de usuarios: {localizado}")
-	print("---------------------------------------------------------------------------------------------------------------------------------------------------")
-	print(f"{campos}\n")
-	for item in clientes:
-		print(f"{item}\n")
+	else:
+		os.system('cls')                           
+		print("La busqueda no arrojó ningún resultado\n\n")
 	
 #Consultar montos por empresa
 def company_amounts(archivo_clientes, archivo_viajes):
 	os.system('cls')
 	
 	listado_viajes = []
+	
 	total_empresa = 0
+	empresa_localizada = ""
+	flag_localizado = 0
 	
 	empresa_buscada = input("Ingrese el nombre de la empresa a consultar: ")	
 	
 	
 	try:
-		#Hay q abrir el archivo en utf para que corra bien el archivo viajes por la codificación que tiene
+		#Hay q abrir el archivo en utf para que corra bien el archivo viajes por la codificación que tiene el otro lo abro en modo sistema
 		with open (archivo_viajes, "r" , newline = '', encoding = 'utf-8') as file1, open (archivo_clientes, "r" , newline = '') as file2:
 		
 			viajes_csv = csv.reader(file1)
@@ -120,13 +136,13 @@ def company_amounts(archivo_clientes, archivo_viajes):
 			#empiezo a leer
 			viajes = next(viajes_csv, None)
 			clientes = next(clientes_csv, None)
-			
+				
 			while viajes:
 				
 				if ((len(viajes[0]) >6) and (len(viajes[0]) < 9)):
 					try:
 						dni = int(viajes[0])
-						listado_viajes.append(dni)
+						
 							
 					except ValueError:
 						print("Hay un caracter no numérico")
@@ -137,23 +153,101 @@ def company_amounts(archivo_clientes, archivo_viajes):
 				
 				dict_Viajes = {"Documento": dni, "Monto": monto}
 				listado_viajes.append(dict_Viajes)
+				
 				viajes = next(viajes_csv, None)
 				
+			
+			while clientes:
 				
+				if (empresa_buscada in clientes[5]):
+					empresa_localizada = clientes[5]
 					
-										
-		
+					flag_localizado += 1
+					
+					for dni in listado_viajes:
+						if dni["Documento"] == int(clientes[2]) :
+							total_empresa += dni["Monto"]
+				
+				
+				clientes = next(clientes_csv, None)	
+					
 	except IOError:
 		print("hubo un error de lectura en alguno de los archivos. Por favor, asegurese de ingresarlos de forma correcta")
 	
-	#formato de solo 2 decimales al float
-	#print(f"{empresa_buscada} ${total_empresa:10.2f}")
+	except IndexError:
+		print("ERROR! Se modificaron columnas en el archivo")
+	except Exception as errorCode:
+		print("Posiblemente ingreso los archivos al revés")
+		print(errorCode)
 	
-	print(listado_viajes)
+	os.system('cls')
+	
+	if (flag_localizado > 0):		
+		print("-------------------------------------------------------------------------------------------------------------")
+		#formato de solo 2 decimales al float
+		print(f"{empresa_localizada} ${total_empresa:10.2f}")
+		print("-------------------------------------------------------------------------------------------------------------\n\n")
+	
+	else: 
+		print("No existen registros de la empresa solicitada\n\n")
+	
+	
+	#print(listado_viajes)
 	
 #Consultar total de viajes y monto por DNI
-def amounts_travels_dni():
-	pass
+def amounts_travels_dni(listado_clientes, archivo_viajes, campos, campos2 ,documento):
+	identificacion = 0
+	localizado = 0
+	total_viajes = 0
+	
+	if ((len(documento) >6) and (len(documento) < 9)):
+		
+		try:
+			identificacion = int(documento)
+						
+		except ValueError:
+			print("Hay un caracter no numérico")
+	else:
+		print("El documento ingresado debe tener de 7 a 8 dígitos")
+	
+	
+	print(campos)
+	print("---------------------------------------------------------------------------------------------------------------------------------------------------")
+	                        
+	for empleado in listado_clientes:                        
+		if identificacion == int(empleado[2]):
+			
+			print(f"[{empleado[0]}, {empleado[1]}, {empleado[2]}, {empleado[3]}, {empleado[4]}, {empleado[5]}]\n")
+			localizado += 1       
+	
+	print("---------------------------------------------------------------------------------------------------------------------------------------------------\n\n")		
+	
+	
+	try:
+		with open (archivo_viajes, "r" , newline = '', encoding = 'utf-8') as file:
+			viajes_csv = csv.reader(file)
+			
+			#salteo el encabezado
+			next(viajes_csv)
+			
+			#empiezo a leer
+			viajes = next(viajes_csv, None)
+			
+			while viajes:
+				if(identificacion == int(viajes[0])):
+					
+					print(f"{viajes[0]}, {viajes[1]}, {viajes[2]}")
+				
+				viajes = next(viajes_csv, None)
+			
+	except IOError:
+		print("hubo un error de lectura en el archivo. Por favor, asegurese de haberlo ingresado de forma correcta")
+	
+	if localizado == 0:
+		os.system('cls')                            
+		print("La busqueda no arrojó ningún resultado \nSugerencia: Intente volver a poner los nombres de los archivos nuevamente.\n\n")
+	
+
 
 #guardar consulta
 def save_query():
@@ -167,6 +261,7 @@ os.system('cls')
 def menu():
 	
 	CAMPOS = ['Nombre', 'Dirección', 'Documento', 'Fecha Alta', 'Correo Electrónico', 'Empresa']
+	CAMPOS2 = ['Documento','fecha', 'monto']
 
 	while True:
 		print("Elija una opcion: \n 1.Buscar cliente \n 2.Total de usuarios por empresa \n 3.Consultar montos por empresa")
@@ -186,8 +281,14 @@ def menu():
 		if opcion == "3":
 			company_amounts(choise_file, choise_file2)
 		if opcion == "4":
-			amounts_travels_dni()
+			os.system('cls')
+			dni = input("Ingrese el número de documento del empleado a consultar: ")
+			amounts_travels_dni(_read_(choise_file), choise_file2, CAMPOS, CAMPOS2, dni)
 		else:
 			print("Por favor elija una opcion valida")
 	
 menu()
+
+
+
+

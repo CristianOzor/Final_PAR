@@ -60,13 +60,13 @@ def find_client(listado, palabra, campos):
 	
 	os.system('cls')
 	
-	print(campos)
+	print(f"[{campos[0]}, {campos[1]}, {campos[2]}, {campos[3]}, {campos[4]}, {campos[5]}]")
 	print("---------------------------------------------------------------------------------------------------------------------------------------------------")
 	                        
 	for cliente in listado:                        
 		if palabra in cliente[0]:
 			
-			print(f"{cliente[0]}, {cliente[1]}, {cliente[2]}, {cliente[3]}, {cliente[4]}, {cliente[5]}\n")
+			print(f"[{cliente[0]}, {cliente[1]}, {cliente[2]}, {cliente[3]}, {cliente[4]}, {cliente[5]}]\n")
 			localizado += 1       
 	
 	print("---------------------------------------------------------------------------------------------------------------------------------------------------\n\n")		
@@ -100,10 +100,11 @@ def find_company(listado, palabra, campos):
 		print("---------------------------------------------------------------------------------------------------------------------------------------------------")
 		print(f"Empresa: {company}\nTotal de usuarios: {localizado}")
 		print("---------------------------------------------------------------------------------------------------------------------------------------------------")
-		print(f"{campos}\n")
+		print(f"[{campos[0]}, {campos[1]}, {campos[2]}, {campos[3]}, {campos[4]}, {campos[5]}]\n")
 	
 		for item in clientes:
-			print(f"{item}\n")
+			print(f"[{item[0]}, {item[2]}, {item[3]}, {item[4]}, {item[5]}]\n")
+			#print(f"{item}\n")
 		
 	else:
 		os.system('cls')                           
@@ -155,6 +156,7 @@ def company_amounts(archivo_clientes, archivo_viajes):
 				listado_viajes.append(dict_Viajes)
 				
 				viajes = next(viajes_csv, None)
+				
 			
 			while clientes:
 				
@@ -190,12 +192,92 @@ def company_amounts(archivo_clientes, archivo_viajes):
 	else: 
 		print("No existen registros de la empresa solicitada\n\n")
 	
+	
 	#print(listado_viajes)
 	
 #Consultar total de viajes y monto por DNI
-def amounts_travels_dni():
-	pass
-
+def amounts_travels_dni(listado_clientes, archivo_viajes, campos, campos2 ,documento):
+	identificacion = 0
+	localizado = 0
+	total_viajes = 0
+	new_list_employee = []
+	new_list_viajes = []
+	
+	if ((len(documento) >6) and (len(documento) < 9)):
+		
+		try:
+			identificacion = int(documento)
+						
+		except ValueError:
+			print("Hay un caracter no numérico")
+	else:
+		print("El documento ingresado debe tener de 7 a 8 dígitos")
+	
+	
+	#print(campos)
+	#print("---------------------------------------------------------------------------------------------------------------------------------------------------")
+	                        
+	for empleado in listado_clientes:                        
+		if identificacion == int(empleado[2]):
+			
+			new_list_employee.append([empleado[0], empleado[1], empleado[2], empleado[3], empleado[4], empleado[5]])
+			#print(f"[{empleado[0]}, {empleado[1]}, {empleado[2]}, {empleado[3]}, {empleado[4]}, {empleado[5]}]\n")
+			localizado += 1       
+	
+	#print("---------------------------------------------------------------------------------------------------------------------------------------------------\n\n")		
+	
+	
+	try:
+		with open (archivo_viajes, "r" , newline = '', encoding = 'utf-8') as file:
+			viajes_csv = csv.reader(file)
+			
+			#salteo el encabezado
+			next(viajes_csv)
+			
+			#empiezo a leer
+			viajes = next(viajes_csv, None)
+			
+			while viajes:
+				if(identificacion == int(viajes[0])):
+					
+					new_list_viajes.append([viajes[0], viajes[1], viajes[2]])
+					#print(f"[{viajes[0]}, {viajes[1]}, {viajes[2]}]")
+					localizado += 1
+					monto = viajes[2].replace(',', '.')
+					monto = float(monto)
+					total_viajes += monto
+					
+				viajes = next(viajes_csv, None)
+			
+	except IOError:
+		print("hubo un error de lectura en el archivo. Por favor, asegurese de haberlo ingresado de forma correcta")
+	
+	
+	
+	if localizado > 0:
+		print("---------------------------------------------------------------------------------------------------------------------------------------------------")		
+		print(f"Documento: {identificacion}")
+		print("---------------------------------------------------------------------------------------------------------------------------------------------------")		
+		print(f"[{campos[0]}, {campos[1]}, {campos[2]}, {campos[3]}, {campos[4]}, {campos[5]}]\n")
+		
+		for elemento in new_list_employee:
+			print(f"[{elemento[0]}, {elemento[1]}, {elemento[2]}, {elemento[3]}, {elemento[4]}, {elemento[5]}]")
+		
+		print("---------------------------------------------------------------------------------------------------------------------------------------------------")		
+		print(f"Total viajes: {len(new_list_viajes)}, Monto: ${total_viajes:0.2f}")
+		print("---------------------------------------------------------------------------------------------------------------------------------------------------")		
+		print(f"[{campos2[0]}, {campos2[1]}, {campos2[2]}]")
+		
+		for elemento in new_list_viajes:
+			print(f"[{elemento[0]}, {elemento[1]}, {elemento[2]}]")
+		
+		print("\n\n")
+	
+	if localizado == 0:
+		os.system('cls')                            
+		print("La busqueda no arrojó ningún resultado \nSugerencia: Intente volver a poner los nombres de los archivos nuevamente.\n\n")
+		
+		
 #guardar consulta
 def save_query():
 	pass
@@ -208,6 +290,7 @@ os.system('cls')
 def menu():
 	
 	CAMPOS = ['Nombre', 'Dirección', 'Documento', 'Fecha Alta', 'Correo Electrónico', 'Empresa']
+	CAMPOS2 = ['Documento','fecha', 'monto']
 
 	while True:
 		print("Elija una opcion: \n 1.Buscar cliente \n 2.Total de usuarios por empresa \n 3.Consultar montos por empresa")
@@ -227,7 +310,9 @@ def menu():
 		if opcion == "3":
 			company_amounts(choise_file, choise_file2)
 		if opcion == "4":
-			amounts_travels_dni()
+			os.system('cls')
+			dni = input("Ingrese el número de documento del empleado a consultar: ")
+			amounts_travels_dni(_read_(choise_file), choise_file2, CAMPOS, CAMPOS2, dni)
 		else:
 			print("Por favor elija una opcion valida")
 	
