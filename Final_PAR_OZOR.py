@@ -1,11 +1,13 @@
 import csv
 import os.path
 import datetime
+import logging
 
 
 user_input = input("Ingrese el nombre del archivo con los datos de los clientes de la empresa: ")
 choise_file = (f"{user_input}.csv")
 
+#limpio pantalla
 os.system('cls')
 
 user_input2 = input("Ingrese el nombre del archivo que contienen los datos de los viajes por cliente: ")
@@ -278,13 +280,47 @@ def amounts_travels_dni(listado_clientes, archivo_viajes, campos, campos2 ,docum
 		print("La busqueda no arrojó ningún resultado \nSugerencia: Intente volver a poner los nombres de los archivos nuevamente.\n\n")
 		
 		
-#guardar consulta
-def save_query():
-	pass
+#guardar archivo log leyendo pág 131 Aprendiendo a programar usando Python/ se va a usar el módulo datetime visto en w3schools
+def save_log(consulta):
+	
+	archivo = "Taxi.log"
+	
+	try:
+		archivo_existe = os.path.isfile(archivo)
+		with open(archivo, "a", newline = '', encoding = 'utf-8') as file:
+			
+		   #Cargo en una variable la hora de ingreso de la consulta
+			hora_actual = str(datetime.datetime.now())
+		
+			if not archivo_existe:
+				file.writelines("Acción, Fecha\n")
+				file.writelines("-----------------------------------------------------------------\n")
+			
+			file.writelines("..................................................................\n")
+			file.write(f"{consulta}, {hora_actual}\n")
+            
+			return
+	except IOError:
+		print("Error fatal inesperado")
+	
 
 #ver consultas
-def inquiries():
-	pass
+def load_log(archivo, password):
+	admin_pass = "paradigmas"
+	
+	if (password == admin_pass):
+	
+		try:
+			with open(archivo, "r", newline = '', encoding = 'utf-8') as file:
+			
+				for linea in file:
+					print(f"{linea}\n")
+            
+			
+		except IOError:
+			print("Error fatal inesperado")
+	else:
+		print("Acceso denegado\n\n")
 
 os.system('cls')
 def menu():
@@ -293,27 +329,59 @@ def menu():
 	CAMPOS2 = ['Documento','fecha', 'monto']
 
 	while True:
-		print("Elija una opcion: \n 1.Buscar cliente \n 2.Total de usuarios por empresa \n 3.Consultar montos por empresa")
-		print(" 4.Consultar total de viajes y monto por DNI \n 5. Salir\n")
+		consulta = "Menú"
+		save_log(consulta)
+		print("Elija una opcion: \n 1.Búsqueda de clientes por nombre \n 2.Búsqueda total usuarios por empresa \n 3.Consultar montos por empresa")
+		print(" 4.Consultar total de viajes y monto por DNI \n 5.Recurso del administrador \n 6.Salir\n")
 		opcion = input("")
 		
-		if opcion == "5":
+		if opcion == "6":
+			consulta = "Salir"
+			save_log(consulta)
 			exit()
 		if opcion == "1":
+			consulta = "Búsqueda de clientes por nombre"
+			save_log(consulta)
+			
 			os.system('cls')
 			palabra_recibida = input("Ingrese el nombre completo o parcial de la persona a buscar: ")
 			find_client(_read_(choise_file), palabra_recibida, CAMPOS)
 		if opcion == "2":
+			consulta = "Búsqueda total usuarios por empresa"
+			save_log(consulta)
+			
 			os.system('cls')
 			palabra_recibida = input("Ingrese el nombre completo o parcial de la empresa a consultar: ")
 			find_company(_read_(choise_file), palabra_recibida, CAMPOS)
 		if opcion == "3":
+			consulta = "Consultar montos por empresa"
+			save_log(consulta)
+			
+			os.system('cls')
 			company_amounts(choise_file, choise_file2)
 		if opcion == "4":
+			consulta = "Consultar total de viajes y monto por DNI"
+			save_log(consulta)
+			
 			os.system('cls')
 			dni = input("Ingrese el número de documento del empleado a consultar: ")
 			amounts_travels_dni(_read_(choise_file), choise_file2, CAMPOS, CAMPOS2, dni)
+		if opcion == "5":
+			#Consulta el archivo .log
+			consulta = "Recurso administrador"
+			save_log(consulta)
+			os.system('cls')
+			
+			password = input("Ingrese el código de acceso:\n")
+			
+			os.system('cls')
+			load_log("Taxi.log", password)
+		
 		else:
+			consulta = "Ingreso inválido al menú"
+			save_log(consulta)
+			
+			
 			print("Por favor elija una opcion valida")
 	
 menu()
